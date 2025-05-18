@@ -1,0 +1,92 @@
+Ansible inventory and playbook creation on locak host
+sudo apt update && sudo apt upgrade -y
+sudo apt install ansible -y
+
+
+ansible --version
+
+
+mkdir -p ~/ansible && cd ~/ansible
+nano inventory.ini
+
+//add this content in inventory,ini
+[local]
+localhost ansible_connection=local
+
+
+Test Connection to Localhost
+ansible -i inventory.ini local -m ping
+
+Expected output:
+localhost | SUCCESS => {
+    "ping": "pong"
+}
+
+
+Create an Ansible Playbook
+nano playbook.yml
+
+
+- name: Localhost Configuration
+  hosts: local
+  become: yes
+  tasks:
+    - name: Update package lists
+      apt:
+        update_cache: yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Create a test file in /tmp
+      copy:
+        content: "This is a test file created by Ansible."
+        dest: /tmp/testfile.txt
+
+    - name: Display a message
+      debug:
+        msg: "Ansible has successfully configured localhost!"
+
+
+Run the Ansible Playbook
+ansible-playbook -i inventory.ini playbook.yml
+
+
+
+Verify the Changes
+After the playbook runs successfully, check if the tasks were executed correctly.
+
+Check if Nginx is installed and running
+
+bash
+Copy
+Edit
+systemctl status nginx
+If it's running, you’ll see output like:
+
+arduino
+Copy
+Edit
+active (running)
+Check if the test file was created
+
+bash
+Copy
+Edit
+cat /tmp/testfile.txt
+Output:
+
+csharp
+Copy
+Edit
+This is a test file created by Ansible.
+
+
+
+ansible-playbook -i inventory.ini playbook.yml --ask-become-pass
+
+
+
+
